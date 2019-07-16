@@ -294,7 +294,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
       return true
     }
 
-    let text = (input as NSString).replacingCharacters(in: range, with: string).applyFormat
+    let text = (input as NSString).replacingCharacters(in: range, with: string)
     delegate?.tokenField?(self, didChangeInputText: text)
 
     for delimiter in delimiters {
@@ -489,30 +489,4 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
 private extension Selector {
   static let togglePlaceholderIfNeeded = #selector(TokenField.togglePlaceholderIfNeeded(_:))
   static let handleTapGesture = #selector(TokenField.handleTapGesture(_:))
-}
-
-private extension String {
-    var applyFormat: String {
-        let isInternationalFormat = self.hasPrefix("+")
-        
-        let cleanPhoneNumber = self.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-        
-        let mask = isInternationalFormat ? "+X (XXX) XXX-XXXX" : "(XXX) XXX-XXXX"
-        
-        var result = ""
-        
-        var index = cleanPhoneNumber.startIndex
-        
-        for ch in mask where index < cleanPhoneNumber.endIndex {
-            if ch == "X" {
-                result.append(cleanPhoneNumber[index])
-                
-                index = cleanPhoneNumber.index(after: index)
-            } else {
-                result.append(ch)
-            }
-        }
-        
-        return result.isEmpty && isInternationalFormat ? "+" + result : result
-    }
 }
