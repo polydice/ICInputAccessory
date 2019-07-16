@@ -37,14 +37,8 @@ internal class BackspaceTextField: UITextField {
 
   weak var backspaceDelegate: BackspaceTextFieldDelegate?
 
-  var showsCursor = true {
-    didSet {
-      // Trigger the lazy instantiation of cursorColor
-      let color = cursorColor
-      tintColor = showsCursor ? color : UIColor.clear
-    }
-  }
-
+  var showsCursor = true
+  
   lazy var cursorColor: UIColor! = { self.tintColor }()
 
   // MARK: - UIView
