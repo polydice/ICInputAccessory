@@ -44,6 +44,8 @@ import UIKit
   @objc optional func tokenField(_ tokenField: TokenField, didDeleteText text: String, atIndex index: Int)
   /// Asks the delegate for the subsequent delimiter string for a completed text in the token field.
   @objc optional func tokenField(_ tokenField: TokenField, subsequentDelimiterForCompletedText text: String) -> String
+  /// Asks the delegate if it should change characters in that range
+  @objc optional func tokenField(_ tokenField: TokenField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool
 }
 
 
@@ -292,7 +294,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
       return true
     }
 
-    let text = (input as NSString).replacingCharacters(in: range, with: string)
+    let text = (input as NSString).replacingCharacters(in: range, with: string).applyFormat
     delegate?.tokenField?(self, didChangeInputText: text)
 
     for delimiter in delimiters {
@@ -314,8 +316,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
 
       return false
     }
-
-    return true
+    return delegate?.tokenField?(self, shouldChangeCharactersIn: range, replacementString: string) ?? true
   }
 
   open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -488,4 +489,30 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
 private extension Selector {
   static let togglePlaceholderIfNeeded = #selector(TokenField.togglePlaceholderIfNeeded(_:))
   static let handleTapGesture = #selector(TokenField.handleTapGesture(_:))
+}
+
+private extension String {
+    var applyFormat: String {
+        let isInternationalFormat = self.hasPrefix("+")
+        
+        let cleanPhoneNumber = self.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        
+        let mask = isInternationalFormat ? "+X (XXX) XXX-XXXX" : "(XXX) XXX-XXXX"
+        
+        var result = ""
+        
+        var index = cleanPhoneNumber.startIndex
+        
+        for ch in mask where index < cleanPhoneNumber.endIndex {
+            if ch == "X" {
+                result.append(cleanPhoneNumber[index])
+                
+                index = cleanPhoneNumber.index(after: index)
+            } else {
+                result.append(ch)
+            }
+        }
+        
+        return result.isEmpty && isInternationalFormat ? "+" + result : result
+    }
 }
