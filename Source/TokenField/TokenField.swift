@@ -135,6 +135,15 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
     }
   }
 
+  /// Customized corner radius for tokens
+  public var tokenCornerRadiusConstant: CGFloat? {
+    didSet {
+      if let cornerRadiusConstant = tokenCornerRadiusConstant {
+        tokens.forEach { $0.cornerRadiusConstant = InsetLabel.CornerRadius.constant(cornerRadiusConstant) }
+      }
+    }
+  }
+
   /// The tint color of icon image and text field.
   open override var tintColor: UIColor! {
     didSet {
@@ -383,9 +392,9 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
 
   private func customizedToken(with text: String) -> Token {
     if let string = delegate?.tokenField?(self, subsequentDelimiterForCompletedText: text) {
-      return Token(text: text, delimiter: string, normalAttributes: normalTokenAttributes, highlightedAttributes: highlightedTokenAttributes)
+      return Token(text: text, delimiter: string, normalAttributes: normalTokenAttributes, highlightedAttributes: highlightedTokenAttributes, cornerRadiusConstant: tokenCornerRadiusConstant)
     } else {
-      return Token(text: text, normalAttributes: normalTokenAttributes, highlightedAttributes: highlightedTokenAttributes)
+      return Token(text: text, normalAttributes: normalTokenAttributes, highlightedAttributes: highlightedTokenAttributes, cornerRadiusConstant: tokenCornerRadiusConstant)
     }
   }
 
