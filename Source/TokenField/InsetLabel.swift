@@ -66,8 +66,11 @@ internal class InsetLabel: UILabel {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    if case .dynamic = cornerRadius {
+    switch cornerRadius {
+    case .dynamic:
       layer.cornerRadius = frame.height / 2
+    case .constant(let radius):
+      layer.cornerRadius = radius
     }
   }
 

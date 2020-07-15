@@ -60,6 +60,12 @@ internal class Token: UIView {
     }
   }
 
+  var cornerRadiusConstant: InsetLabel.CornerRadius = .constant(3) {
+    didSet {
+      if isHighlighted { updateTextLabel() }
+    }
+  }
+
   // MARK: - Private Properties
 
   private(set) lazy var delimiterLabel: UILabel = {
@@ -70,7 +76,7 @@ internal class Token: UIView {
   }()
 
   private(set) lazy var textLabel: UILabel = {
-    let _label = InsetLabel(contentEdgeInsets: UIEdgeInsets(top: 3, left: 5, bottom: 3, right: 5), cornerRadius: .constant(3))
+    let _label = InsetLabel(contentEdgeInsets: UIEdgeInsets(top: 3, left: 5, bottom: 3, right: 5), cornerRadius: cornerRadiusConstant)
     _label.textAlignment = .center
     _label.textColor = self.normalTextAttributes[.foregroundColor] as? UIColor
     _label.backgroundColor = self.normalTextAttributes[.backgroundColor] as? UIColor
@@ -94,11 +100,13 @@ internal class Token: UIView {
     text: String,
     delimiter: String = ",",
     normalAttributes: [NSAttributedStringKey: NSObject]? = nil,
-    highlightedAttributes: [NSAttributedStringKey: NSObject]? = nil
+    highlightedAttributes: [NSAttributedStringKey: NSObject]? = nil,
+    cornerRadiusConstant: CGFloat? = nil
   ) {
     self.init()
     if let attributes = normalAttributes { normalTextAttributes = attributes }
     if let attributes = highlightedAttributes { highlightedTextAttributes = attributes }
+    if let attributes = cornerRadiusConstant { self.cornerRadiusConstant = .constant(attributes) }
     delimiterLabel.text = delimiter
     ({
       // Workaround to trigger didSet inside the initializer
@@ -116,6 +124,9 @@ internal class Token: UIView {
     // Avoid overlapped translucent background colors
     attributes[.backgroundColor] = nil
     textLabel.attributedText = NSAttributedString(string: text, attributes: attributes)
+    if let textLabel = textLabel as? InsetLabel {
+      textLabel.cornerRadius = cornerRadiusConstant
+    }
 
     delimiterLabel.textColor = normalTextAttributes[.foregroundColor] as? UIColor
     delimiterLabel.font = normalTextAttributes[.font] as? UIFont
