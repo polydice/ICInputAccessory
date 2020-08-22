@@ -1,0 +1,5 @@
+workspace "ICInputAccessory.xcworkspace"
+scheme "Example"
+clean true
+skip_build true
+code_coverage true
